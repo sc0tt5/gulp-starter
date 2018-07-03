@@ -1,20 +1,26 @@
-import gulp from 'gulp';
 import del from 'del';
+import gulp from 'gulp';
+import autoprefixer from 'gulp-autoprefixer';
 import babel from 'gulp-babel';
 import cleanCSS from 'gulp-clean-css';
 import concat from 'gulp-concat';
+import flatten from 'gulp-flatten';
 import htmlclean from 'gulp-htmlclean';
 import htmlmin from 'gulp-htmlmin';
 import inject from 'gulp-inject';
-import sourcemaps from 'gulp-sourcemaps';
+import minifycss from 'gulp-minify-css';
+import rename from 'gulp-rename';
+import sass from 'gulp-sass';
 import uglify from 'gulp-uglify';
 
 // paths
 const paths = {
+	// src
 	src: 'src/**/*',
 	srcHTML: 'src/**/*.html',
-	srcCSS: 'src/**/*.css',
+	srcCSS: 'src/**/*.scss',
 	srcJS: 'src/**/*.js',
+	// dist
 	dist: 'dist',
 	distIndex: 'dist/index.html',
 	distCSS: 'dist/**/*.css',
@@ -25,18 +31,21 @@ const paths = {
 gulp.task('html:dist', () =>
 	gulp
 		.src(paths.srcHTML)
-		.pipe(sourcemaps.init())
 		.pipe(htmlclean())
 		.pipe(htmlmin({ collapseWhitespace: true }))
-		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(paths.dist))
 );
 
-// css to dist
+// scss to dist as css
 gulp.task('css:dist', () =>
 	gulp
 		.src(paths.srcCSS)
+		.pipe(sass.sync().on('error', sass.logError))
+		.pipe(sass({ style: 'compressed' }))
+		.pipe(autoprefixer('last 3 version', 'safari 5', 'ie 8', 'ie 9'))
 		.pipe(cleanCSS())
+		.pipe(minifycss())
+		.pipe(rename({ suffix: '.min' }))
 		.pipe(gulp.dest(paths.dist))
 );
 
@@ -44,7 +53,6 @@ gulp.task('css:dist', () =>
 gulp.task('js:dist', () =>
 	gulp
 		.src(paths.srcJS)
-		.pipe(sourcemaps.init())
 		.pipe(
 			babel({
 				presets: ['env']
@@ -56,12 +64,21 @@ gulp.task('js:dist', () =>
 				console.log(e);
 			})
 		)
-		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(paths.dist))
 );
 
+// copy dependencies to ./dist/libs/
+gulp.task('copy:libs', () => {
+	gulp.src([
+		'node_modules/**/*jquery.min.js',
+		'node_modules/**/*lodash.min.js'
+	])
+		.pipe(flatten())
+		.pipe(gulp.dest('./dist/lib'));
+});
+
 // wrapper task
-gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist']);
+gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist', 'copy:libs']);
 
 // inject, build and watch
 gulp.task('inject:dist', ['copy:dist'], () => {
