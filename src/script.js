@@ -1,4 +1,4 @@
 let testJs = () => {
-	return 'testing...1 2 3';
+	return 'test 123';
 };
 console.log(testJs());

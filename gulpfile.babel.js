@@ -1,106 +1,146 @@
-import del from 'del';
+'use strict';
+
+// package vars
+import pkg from './package.json';
+
+// gulp
 import gulp from 'gulp';
-import autoprefixer from 'gulp-autoprefixer';
-import babel from 'gulp-babel';
-import cleanCSS from 'gulp-clean-css';
-import concat from 'gulp-concat';
-import flatten from 'gulp-flatten';
-import htmlclean from 'gulp-htmlclean';
-import htmlmin from 'gulp-htmlmin';
-import inject from 'gulp-inject';
-import minifycss from 'gulp-minify-css';
-import rename from 'gulp-rename';
-import sass from 'gulp-sass';
-import uglify from 'gulp-uglify';
 
-// paths
-const paths = {
-	// src
-	src: 'src/**/*',
-	srcHTML: 'src/**/*.html',
-	srcCSS: 'src/**/*.scss',
-	srcJS: 'src/**/*.js',
-	// dist
-	dist: 'dist',
-	distIndex: 'dist/index.html',
-	distCSS: 'dist/**/*.css',
-	distJS: 'dist/**/*.js'
-};
+// load all plugins in "devDependencies" into the variable $
+const $ = require('gulp-load-plugins')({
+	pattern: ['*'],
+	scope: ['devDependencies'],
+	rename: {
+		'gulp-clean-css': 'cleancss',
+		'gulp-minify-css': 'minifycss'
+	}
+});
 
-// html to dist
-gulp.task('html:dist', () =>
+// file paths
+const paths = pkg.paths;
+
+// css
+//-------------------------------------
+
+// css to src (with sourcemaps) TODO: sourcemaps
+gulp.task('css', () =>
 	gulp
-		.src(paths.srcHTML)
-		.pipe(htmlclean())
-		.pipe(htmlmin({ collapseWhitespace: true }))
-		.pipe(gulp.dest(paths.dist))
-);
-
-// scss to dist as css
-gulp.task('css:dist', () =>
-	gulp
-		.src(paths.srcCSS)
-		.pipe(sass.sync().on('error', sass.logError))
-		.pipe(sass({ style: 'compressed' }))
-		.pipe(autoprefixer('last 3 version', 'safari 5', 'ie 8', 'ie 9'))
-		.pipe(cleanCSS())
-		.pipe(minifycss())
-		.pipe(rename({ suffix: '.min' }))
-		.pipe(gulp.dest(paths.dist))
-);
-
-// js to dist
-gulp.task('js:dist', () =>
-	gulp
-		.src(paths.srcJS)
+		.src(paths.src.scss)
 		.pipe(
-			babel({
+			$.plumber({
+				errorHandler: $.notify.onError('Error: <%= error.message %>')
+			})
+		)
+		.pipe($.sass.sync().on('error', $.sass.logError))
+		.pipe($.sass({ style: 'compressed' }))
+		.pipe($.autoprefixer('last 3 version', 'safari 5', 'ie 8', 'ie 9'))
+		.pipe($.cleancss())
+		.pipe($.minifycss())
+		.pipe($.rename({ suffix: '.min' }))
+		.pipe(gulp.dest(paths.dist.base))
+);
+
+// lib
+//-------------------------------------
+
+// concat libs and add to dist
+gulp.task('lib', () => {
+	gulp.src(pkg.globs.distJs)
+		.pipe(
+			$.plumber({
+				errorHandler: $.notify.onError('Error: <%= error.message %>')
+			})
+		)
+		.pipe($.flatten())
+		.pipe($.concat('lib.min.js'))
+		.pipe(gulp.dest(paths.dist.base));
+});
+
+// js
+//-------------------------------------
+
+// js min to dist TODO: sourcemaps
+gulp.task('js', () =>
+	gulp
+		.src(paths.src.js)
+		.pipe(
+			$.plumber({
+				errorHandler: $.notify.onError('Error: <%= error.message %>')
+			})
+		)
+		.pipe(
+			$.babel({
 				presets: ['env']
 			})
 		)
-		.pipe(concat('script.min.js'))
+		.pipe($.concat('script.min.js'))
 		.pipe(
-			uglify().on('error', e => {
-				console.log(e);
+			$.uglify().on('error', e => {
+				console.log('js task error: ' + e);
 			})
 		)
-		.pipe(gulp.dest(paths.dist))
+		.pipe(gulp.dest(paths.dist.base))
 );
 
-// copy dependencies to ./dist/libs/
-gulp.task('copy:libs', () => {
-	gulp.src([
-		'node_modules/**/*jquery.min.js',
-		'node_modules/**/*lodash.min.js'
-	])
-		.pipe(flatten())
-		.pipe(gulp.dest('./dist/lib'));
-});
+// html
+//-------------------------------------
 
-// wrapper task
-gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist', 'copy:libs']);
-
-// inject, build and watch
-gulp.task('inject:dist', ['copy:dist'], () => {
-	let css = gulp.src(paths.distCSS),
-		js = gulp.src(paths.distJS);
-
+// min files html inject dist
+gulp.task('html', () => {
+	let sources = gulp.src([paths.dist.css, paths.dist.lib, paths.dist.js], {
+		read: false
+	});
 	return gulp
-		.src(paths.distIndex)
-		.pipe(inject(css, { relative: true }))
-		.pipe(inject(js, { relative: true }))
-		.pipe(gulp.dest(paths.dist));
+		.src(paths.src.html)
+		.pipe(
+			$.plumber({
+				errorHandler: $.notify.onError('Error: <%= error.message %>')
+			})
+		)
+		.pipe($.inject(sources))
+		.pipe(gulp.dest(paths.dist.base));
 });
 
-gulp.task('build', ['inject:dist']);
+// build and watch
+//-------------------------------------
 
-gulp.task('watch', ['build'], () => {
-	gulp.watch(paths.src, ['inject:dist']);
+// web server for testing things out
+gulp.task('webserver', () => {
+	$.connect.server({
+		livereload: true
+	});
 });
 
-gulp.task('default', ['watch']);
+// build
+gulp.task('build', $.sequence('css', 'lib', 'js', 'html'));
 
-// prevent dist from pushing to repo
-gulp.task('clean', () => {
-	del([paths.dist]);
+// dev
+gulp.task('dev', () => {
+	// kick things off
+	gulp.start('build');
+
+	// watch sass
+	$.watch(paths.src.scss).on('change', () => {
+		$.sequence('css', 'html'); // update html min file
+	});
+	// watch js
+	$.watch(paths.src.js).on('change', () => {
+		$.sequence('js', 'html'); // update html min file
+	});
+	// watch html
+	$.watch(paths.src.html).on('change', () => {
+		gulp.start('html');
+	});
 });
+
+// default
+gulp.task('default', () => {
+	gulp.start('dev');
+});
+
+// reset
+//-------------------------------------
+
+gulp.task('reset', () =>
+	gulp.src(paths.dist.base, { read: false }).pipe($.clean(paths.dist.base))
+);
