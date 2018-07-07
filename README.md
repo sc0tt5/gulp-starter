@@ -21,7 +21,7 @@ Built with:
     -   [rename](https://www.npmjs.com/package/gulp-rename)
     -   [sass](https://www.npmjs.com/package/gulp-sass)
     -   [sequence](https://www.npmjs.com/package/gulp-sequence)
-    -   [sourcemaps](https://www.npmjs.com/package/gulp-sourcemaps)
+    -   [source maps](https://www.npmjs.com/package/gulp-sourcemaps)
     -   [uglify](https://www.npmjs.com/package/gulp-uglify)
 
 ## Getting Started
