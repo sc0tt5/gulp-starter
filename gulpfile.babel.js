@@ -16,28 +16,49 @@ const $ = require('gulp-load-plugins')({
 	}
 });
 
-// file paths
-const paths = pkg.paths;
+// file paths and error notification
+const paths = pkg.paths,
+	notifyError = $.notify.onError('Error: <%= error.message %>');
 
 // css
 //-------------------------------------
 
-// css to src (with sourcemaps) TODO: sourcemaps
+// scss to css, then dist
 gulp.task('css', () =>
 	gulp
 		.src(paths.src.scss)
+		.pipe($.plumber({ errorHandler: notifyError }))
 		.pipe(
-			$.plumber({
-				errorHandler: $.notify.onError('Error: <%= error.message %>')
+			$.sass({
+				outputStyle: 'expanded',
+				errLogToConsole: false,
+				onError: error => $.notify().write(error)
 			})
 		)
-		.pipe($.sass.sync().on('error', $.sass.logError))
-		.pipe($.sass({ style: 'compressed' }))
 		.pipe($.autoprefixer('last 3 version', 'safari 5', 'ie 8', 'ie 9'))
+		.pipe($.header('/* Auto-generated from src. Do not edit. */\n')) // add comment to top of min file
+		.pipe(gulp.dest(paths.dist.base))
+);
+
+// css to css min with sourcemaps
+gulp.task('cssmin', () =>
+	gulp
+		.src(paths.dist.css)
+		.pipe($.plumber({ errorHandler: notifyError }))
+		.pipe($.sourcemaps.init())
 		.pipe($.cleancss())
 		.pipe($.minifycss())
 		.pipe($.rename({ suffix: '.min' }))
+		.pipe($.header('/* Auto-generated from src. Do not edit. */\n')) // add comment to top of min file
+		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest(paths.dist.base))
+);
+
+// css watcher
+gulp.task('css-watch', () =>
+	gulp.watch('src/**/*.scss', () => {
+		$.sequence('css', 'cssmin', 'html');
+	})
 );
 
 // lib
@@ -46,11 +67,7 @@ gulp.task('css', () =>
 // concat libs and add to dist
 gulp.task('lib', () => {
 	gulp.src(pkg.globs.distJs)
-		.pipe(
-			$.plumber({
-				errorHandler: $.notify.onError('Error: <%= error.message %>')
-			})
-		)
+		.pipe($.plumber({ errorHandler: notifyError }))
 		.pipe($.flatten())
 		.pipe($.concat('lib.min.js'))
 		.pipe(gulp.dest(paths.dist.base));
@@ -59,79 +76,72 @@ gulp.task('lib', () => {
 // js
 //-------------------------------------
 
-// js min to dist TODO: sourcemaps
+// es6 to es5, then dist
 gulp.task('js', () =>
 	gulp
 		.src(paths.src.js)
-		.pipe(
-			$.plumber({
-				errorHandler: $.notify.onError('Error: <%= error.message %>')
-			})
-		)
-		.pipe(
-			$.babel({
-				presets: ['env']
-			})
-		)
+		.pipe($.plumber({ errorHandler: notifyError }))
+		.pipe($.babel({ presets: ['env'] }))
+		.pipe($.header('/* Auto-generated from src. Do not edit. */\n')) // add comment to top of min file
+		.pipe(gulp.dest(paths.dist.base))
+);
+
+// js to js min
+gulp.task('jsmin', () =>
+	gulp
+		.src(paths.dist.js)
+		.pipe($.plumber({ errorHandler: notifyError }))
+		.pipe($.sourcemaps.init())
 		.pipe($.concat('script.min.js'))
 		.pipe(
-			$.uglify().on('error', e => {
-				console.log('js task error: ' + e);
-			})
+			$.uglify().on('error', error => $.notify(`js task error: ${error}`))
 		)
+		.pipe($.header('/* Auto-generated from src. Do not edit. */\n')) // add comment to top of min file
+		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest(paths.dist.base))
+);
+
+// js watcher
+gulp.task('js-watch', () =>
+	gulp.watch('src/**/*.js', () => {
+		$.sequence('js', 'jsmin', 'html');
+	})
 );
 
 // html
 //-------------------------------------
 
-// min files html inject dist
+// html to dist, inject with cssa and js
 gulp.task('html', () => {
-	let sources = gulp.src([paths.dist.css, paths.dist.lib, paths.dist.js], {
-		read: false
-	});
+	let sources = gulp.src(
+		[paths.dist.cssmin, paths.dist.lib, paths.dist.jsmin],
+		{
+			read: false
+		}
+	);
 	return gulp
 		.src(paths.src.html)
-		.pipe(
-			$.plumber({
-				errorHandler: $.notify.onError('Error: <%= error.message %>')
-			})
-		)
+		.pipe($.plumber({ errorHandler: notifyError }))
 		.pipe($.inject(sources))
+		.pipe($.header('<!-- Auto-generated from src. Do not edit. -->\n')) // add comment to top of file
 		.pipe(gulp.dest(paths.dist.base));
 });
 
-// build and watch
-//-------------------------------------
-
-// web server for testing things out
-gulp.task('webserver', () => {
-	$.connect.server({
-		livereload: true
-	});
-});
+// html watcher
+gulp.task('html-watch', () =>
+	gulp.watch('src/**/*.html', () => {
+		gulp.start('html');
+	})
+);
 
 // build
-gulp.task('build', $.sequence('css', 'lib', 'js', 'html'));
+//-------------------------------------
 
-// dev
-gulp.task('dev', () => {
-	// kick things off
-	gulp.start('build');
+// build
+gulp.task('build', $.sequence('css', 'js', 'lib', 'cssmin', 'jsmin', 'html'));
 
-	// watch sass
-	$.watch(paths.src.scss).on('change', () => {
-		$.sequence('css', 'html'); // update html min file
-	});
-	// watch js
-	$.watch(paths.src.js).on('change', () => {
-		$.sequence('js', 'html'); // update html min file
-	});
-	// watch html
-	$.watch(paths.src.html).on('change', () => {
-		gulp.start('html');
-	});
-});
+// dev (build then watch for changes)
+gulp.task('dev', $.sequence('build', 'css-watch', 'js-watch', 'html-watch'));
 
 // default
 gulp.task('default', () => {
@@ -141,6 +151,6 @@ gulp.task('default', () => {
 // reset
 //-------------------------------------
 
-gulp.task('reset', () =>
-	gulp.src(paths.dist.base, { read: false }).pipe($.clean(paths.dist.base))
-);
+gulp.task('reset', () => {
+	gulp.src(paths.dist.base, { read: false }).pipe($.clean(paths.dist.base)); // remove dist
+});

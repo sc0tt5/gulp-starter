@@ -1,7 +1,7 @@
 {
 	"name": "gulp-starter",
 	"version": "1.0.0",
-	"description": "",
+	"description": "gulp starter",
 	"main": "gulpfile.babel.js",
 	"author": "Scott Robertson",
 	"license": "MIT",
@@ -9,15 +9,17 @@
 	"paths": {
 		"src": {
 			"base": "./src/",
+			"scss": "./src/styles.scss",
 			"html": "./src/index.html",
-			"js": "./src/script.js",
-			"scss": "./src/styles.scss"
+			"js": "./src/script.js"
 		},
 		"dist": {
 			"base": "./dist/",
-			"css": "./dist/styles.min.css",
+			"css": "./dist/styles.css",
+			"cssmin": "./dist/styles.min.css",
 			"html": "./dist/index.html",
-			"js": "./dist/script.min.js",
+			"js": "./dist/script.js",
+			"jsmin": "./dist/script.min.js",
 			"lib": "./dist/lib.min.js"
 		}
 	},
@@ -41,8 +43,8 @@
 		"gulp-clean": "^0.4.0",
 		"gulp-clean-css": "^3.9.4",
 		"gulp-concat": "^2.6.1",
-		"gulp-connect": "^5.5.0",
 		"gulp-flatten": "^0.4.0",
+		"gulp-header": "^2.0.5",
 		"gulp-htmlclean": "^2.7.22",
 		"gulp-htmlmin": "^4.0.0",
 		"gulp-inject": "^4.3.2",
@@ -55,7 +57,6 @@
 		"gulp-sequence": "^1.0.0",
 		"gulp-sourcemaps": "^2.6.4",
 		"gulp-uglify": "^3.0.0",
-		"gulp-watch": "^5.0.0",
 		"jshint": "^2.9.5"
 	},
 	"babel": {
