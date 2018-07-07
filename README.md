@@ -11,14 +11,11 @@ Built with:
     -   [concat](https://www.npmjs.com/package/gulp-concat)
     -   [flatten](https://www.npmjs.com/package/gulp-flatten)
     -   [header](https://www.npmjs.com/package/gulp-header)
-    -   [htmlclean](https://www.npmjs.com/package/gulp-htmlclean)
     -   [htmlmin](https://www.npmjs.com/package/gulp-htmlmin)
     -   [inject](https://www.npmjs.com/package/gulp-inject)
     -   [load plugins](https://www.npmjs.com/package/gulp-load-plugins)
-    -   [minify css](https://www.npmjs.com/package/gulp-minify-css)
     -   [notify](https://www.npmjs.com/package/gulp-notify)
     -   [plumber](https://www.npmjs.com/package/gulp-plumber)
-    -   [rename](https://www.npmjs.com/package/gulp-rename)
     -   [sass](https://www.npmjs.com/package/gulp-sass)
     -   [sequence](https://www.npmjs.com/package/gulp-sequence)
     -   [source maps](https://www.npmjs.com/package/gulp-sourcemaps)
@@ -42,5 +39,4 @@ npm start
 
 ## ToDo
 
--   Change [gulp-minify-css](https://www.npmjs.com/package/gulp-minify-css) to [gulp-clean-css](https://github.com/scniro/gulp-clean-css)
 -   Unit Test

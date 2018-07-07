@@ -11,8 +11,7 @@ const $ = require('gulp-load-plugins')({
 	pattern: ['*'],
 	scope: ['devDependencies'],
 	rename: {
-		'gulp-clean-css': 'cleancss',
-		'gulp-minify-css': 'minifycss'
+		'gulp-clean-css': 'cleancss'
 	}
 });
 
@@ -47,8 +46,7 @@ gulp.task('cssmin', () =>
 		.pipe($.plumber({ errorHandler: notifyError }))
 		.pipe($.sourcemaps.init())
 		.pipe($.cleancss())
-		.pipe($.minifycss())
-		.pipe($.rename({ suffix: '.min' }))
+		.pipe($.concat('styles.min.css'))
 		.pipe($.header('/* Auto-generated from src. Do not edit. */\n')) // add comment to top of min file
 		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest(paths.dist.base))
@@ -122,6 +120,7 @@ gulp.task('html', () => {
 	return gulp
 		.src(paths.src.html)
 		.pipe($.plumber({ errorHandler: notifyError }))
+		.pipe($.htmlmin({ collapseWhitespace: true }))
 		.pipe($.inject(sources))
 		.pipe($.header('<!-- Auto-generated from src. Do not edit. -->\n')) // add comment to top of file
 		.pipe(gulp.dest(paths.dist.base));
