@@ -1,10 +1,8 @@
 'use strict';
 
-// package vars
-import pkg from './package.json';
-
-// gulp
+import pkg from './package.json'; // package vars
 import gulp from 'gulp';
+import karma from 'karma';
 
 // load all plugins in "devDependencies" into the variable $
 const $ = require('gulp-load-plugins')({
@@ -91,9 +89,7 @@ gulp.task('jsmin', () =>
 		.pipe($.plumber({ errorHandler: notifyError }))
 		.pipe($.sourcemaps.init())
 		.pipe($.concat('script.min.js'))
-		.pipe(
-			$.uglify().on('error', error => $.notify(`js task error: ${error}`))
-		)
+		.pipe($.uglify().on('error', error => $.notify(`js task error: ${error}`)))
 		.pipe($.header('/* Auto-generated from src. Do not edit. */\n')) // add comment to top of min file
 		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest(paths.dist.base))
@@ -111,12 +107,9 @@ gulp.task('js-watch', () =>
 
 // html to dist, inject with cssa and js
 gulp.task('html', () => {
-	let sources = gulp.src(
-		[paths.dist.cssmin, paths.dist.lib, paths.dist.jsmin],
-		{
-			read: false
-		}
-	);
+	let sources = gulp.src([paths.dist.cssmin, paths.dist.lib, paths.dist.jsmin], {
+		read: false
+	});
 	return gulp
 		.src(paths.src.html)
 		.pipe($.plumber({ errorHandler: notifyError }))
@@ -133,14 +126,33 @@ gulp.task('html-watch', () =>
 	})
 );
 
+// unit test
+//-------------------------------------
+
+const Server = karma.Server;
+
+gulp.task('test', done => {
+	new Server(
+		{
+			configFile: __dirname + '/karma.conf.js',
+			singleRun: true
+		},
+		done
+	).start();
+});
+
+gulp.task('spec-watch', () => {
+	gulp.watch('src/**/*.js', ['test']);
+});
+
 // build
 //-------------------------------------
 
 // build
-gulp.task('build', $.sequence('css', 'js', 'lib', 'cssmin', 'jsmin', 'html'));
+gulp.task('build', $.sequence('css', 'js', 'lib', 'cssmin', 'jsmin', 'html', 'test'));
 
 // dev (build then watch for changes)
-gulp.task('dev', $.sequence('build', 'css-watch', 'js-watch', 'html-watch'));
+gulp.task('dev', $.sequence('build', 'css-watch', 'js-watch', 'html-watch', 'spec-watch'));
 
 // default
 gulp.task('default', () => {

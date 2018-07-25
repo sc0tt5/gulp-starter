@@ -1,8 +1,17 @@
 {
 	"name": "gulp-starter",
 	"version": "1.0.0",
-	"description": "gulp starter",
-	"repository": "sc0tt5/gulp-starter",
+	"description": "An example project for getting started with gulp, including Jasmine unit testing",
+	"keywords": [
+		"gulp",
+		"jasmine",
+		"karma",
+		"phantomjs"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sc0tt5/gulp-starter"
+	},
 	"main": "gulpfile.babel.js",
 	"author": "Scott Robertson (https://github.com/sc0tt5)",
 	"license": "ISC",
@@ -55,7 +64,16 @@
 		"gulp-sequence": "^1.0.0",
 		"gulp-sourcemaps": "^2.6.4",
 		"gulp-uglify": "^3.0.0",
-		"jshint": "^2.9.5"
+		"jasmine-core": "^3.1.0",
+		"jshint": "^2.9.5",
+		"karma": "^2.0.4",
+		"karma-babel-preprocessor": "^7.0.0",
+		"karma-coverage": "^1.1.2",
+		"karma-jasmine": "^1.1.2",
+		"karma-jasmine-html-reporter": "^1.2.0",
+		"karma-notify-reporter": "^1.0.1",
+		"karma-phantomjs-launcher": "^1.0.4",
+		"phantomjs": "^2.1.7"
 	},
 	"babel": {
 		"presets": [
@@ -66,7 +84,8 @@
 		"jquery": "^3.3.1"
 	},
 	"scripts": {
-		"start": "gulp",
-		"build": "gulp build"
+		"build": "gulp build",
+		"dev": "gulp",
+		"test": "gulp test"
 	}
 }

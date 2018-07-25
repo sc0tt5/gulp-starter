@@ -22,6 +22,9 @@ Built with:
     -   [sequence](https://www.npmjs.com/package/gulp-sequence) (run tasks in order)
     -   [source maps](https://www.npmjs.com/package/gulp-sourcemaps) (connecting min to source files for debugging)
     -   [uglify](https://www.npmjs.com/package/gulp-uglify) (minify JavaScript)
+    -   [jasmine](https://www.npmjs.com/package/jasmine-core) (unit testing)
+    -   [karma](https://www.npmjs.com/package/karma) (test runner)
+    -   [phantomjs](https://www.npmjs.com/package/phantomjs-prebuilt) (headless browser for unit testing)
 
 ## Getting Started
 
@@ -41,4 +44,5 @@ npm start
 
 ## ToDo
 
--   Unit Test
+-   Jasmine spec files in ES6
+-   Run test on changed file only using gulp-newer, prevent src-to-dist if fail

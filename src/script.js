@@ -1,4 +1,3 @@
-let testJs = () => {
-	return 'test';
-};
-console.log(testJs());
+function helloWorld() {
+	return 'Hello world!';
+}

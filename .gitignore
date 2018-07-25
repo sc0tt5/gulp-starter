@@ -7,3 +7,6 @@ logs
 results
 npm-debug.log
 dist
+_reports
+test-results
+tmp

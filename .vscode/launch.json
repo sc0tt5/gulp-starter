@@ -1,16 +1,28 @@
-{	
+{
 	"version": "0.2.0",
+	"compounds": [
+		{
+			"name": "Start server and chrome debugger",
+			"configurations": ["Gulp sync", "Chrome : Launch with sourcemaps"]
+		}
+	],
 	"configurations": [
 		{
-			"name": "gulp starter",
+			"name": "Gulp sync",
 			"type": "node",
 			"request": "launch",
-			"program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
-			"stopOnEntry": false,
-			"args": [],
-			"cwd": "${workspaceRoot}",
-			"runtimeArgs": ["--nolazy"],
-			"console": "internalConsole"
+			"program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+			"args": ["dev"]
+		},
+		{
+			"name": "Chrome : Launch with sourcemaps",
+			// works with or without preLaunchTask
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceRoot}",
+			"sourceMaps": true,
+			"runtimeArgs": ["--remote-debugging-port=9222"]
 		}
 	]
 }
