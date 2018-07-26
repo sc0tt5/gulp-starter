@@ -13,6 +13,7 @@ Built with:
     -   [concat](https://www.npmjs.com/package/gulp-concat) (concatenate files)
     -   [flatten](https://www.npmjs.com/package/gulp-flatten) (remove file path, return file name only)
     -   [header](https://www.npmjs.com/package/gulp-header) (insert comment at top of file)
+    -   [htmlhint](https://www.npmjs.com/package/gulp-htmlhint) (html validation)
     -   [htmlmin](https://www.npmjs.com/package/gulp-htmlmin) (minify HTML)
     -   [inject](https://www.npmjs.com/package/gulp-inject) (inject CSS and JavaScript bundles into HTML files)
     -   [load plugins](https://www.npmjs.com/package/gulp-load-plugins) (load gulp plugins from package.json)
@@ -22,9 +23,9 @@ Built with:
     -   [sequence](https://www.npmjs.com/package/gulp-sequence) (run tasks in order)
     -   [source maps](https://www.npmjs.com/package/gulp-sourcemaps) (connecting min to source files for debugging)
     -   [uglify](https://www.npmjs.com/package/gulp-uglify) (minify JavaScript)
-    -   [jasmine](https://www.npmjs.com/package/jasmine-core) (unit testing)
-    -   [karma](https://www.npmjs.com/package/karma) (test runner)
-    -   [phantomjs](https://www.npmjs.com/package/phantomjs-prebuilt) (headless browser for unit testing)
+-   [Jasmine](https://www.npmjs.com/package/jasmine-core) (unit testing)
+-   [Karma](https://www.npmjs.com/package/karma) (test runner)
+-   [PhantomJS](https://www.npmjs.com/package/phantomjs-prebuilt) (headless browser for unit testing)
 
 ## Getting Started
 
