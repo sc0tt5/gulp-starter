@@ -113,6 +113,8 @@ gulp.task('html', () => {
 	return gulp
 		.src(paths.src.html)
 		.pipe($.plumber({ errorHandler: notifyError }))
+		.pipe($.htmlhint())
+		.pipe($.htmlhint.failAfterError())
 		.pipe($.htmlmin({ collapseWhitespace: true }))
 		.pipe($.inject(sources))
 		.pipe($.header('<!-- Auto-generated from src. Do not edit. -->\n')) // add comment to top of file
