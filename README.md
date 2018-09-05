@@ -1,6 +1,6 @@
 # Gulp Starter
 
-A generic frontent build workflow, demonstrating various gulp plugins
+A generic frontend build workflow, demonstrating various gulp plugins
 
 Built with:
 
