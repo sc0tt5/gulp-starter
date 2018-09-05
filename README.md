@@ -1,6 +1,6 @@
 # Gulp Starter
 
-Demonstrates various gulp plugins.
+A generic frontent build workflow, demonstrating various gulp plugins
 
 Built with:
 
@@ -26,6 +26,29 @@ Built with:
 -   [Jasmine](https://www.npmjs.com/package/jasmine-core) (unit testing)
 -   [Karma](https://www.npmjs.com/package/karma) (test runner)
 -   [PhantomJS](https://www.npmjs.com/package/phantomjs-prebuilt) (headless browser for unit testing)
+
+Project Directory
+
+```bash
+$ gulp-starter
+.
+├── build           # used for temporary file builds
+│   ├── ...
+├── public          # public distribution
+│   ├── css
+│   ├── img
+│   ├── js
+│   └── index.html
+├── src             # source code
+│   ├── css
+│   ├── img
+│   ├── js
+│   ├── test
+│   └── index.html
+├── gulpfile.babel.js
+└── package.json
+└── ...
+```
 
 ## Getting Started
 

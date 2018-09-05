@@ -1,0 +1,20 @@
+{
+	"env": {
+		"amd": true,
+		"browser": true,
+		"es6": true,
+		"jasmine": true
+	},
+	"extends": "eslint:recommended",
+	"globals": {
+		"module": false
+	},
+	"rules": {
+		"no-console": ["error", { "allow": ["warn", "error"] }],
+		"quotes": ["error", "single"],
+		"semi": 1
+	},
+	"parserOptions": {
+		"sourceType": "module"
+	}
+}
