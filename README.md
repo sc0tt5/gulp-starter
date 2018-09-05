@@ -17,6 +17,7 @@ A generic frontend build workflow, demonstrating various gulp plugins
     -   [header](https://www.npmjs.com/package/gulp-header) (insert comment at top of file)
     -   [htmlhint](https://www.npmjs.com/package/gulp-htmlhint) (html validation)
     -   [htmlmin](https://www.npmjs.com/package/gulp-htmlmin) (minify HTML)
+    -   [imagemin](https://www.npmjs.com/package/gulp-imagemin) (minify images)
     -   [inject](https://www.npmjs.com/package/gulp-inject) (inject CSS and JavaScript bundles into HTML files)
     -   [load plugins](https://www.npmjs.com/package/gulp-load-plugins) (load gulp plugins from package.json)
     -   [newer](https://www.npmjs.com/package/gulp-newer) ( (only allow changed files - supports many:1)
