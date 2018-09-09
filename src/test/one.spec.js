@@ -1,5 +1,11 @@
-describe('Hello world 1', function() {
-	it('says hello', function() {
-		expect(helloWorldOne()).toEqual('Hello world 1!');
+describe('Hello world 1', () => {
+	beforeEach(() => {
+		spyOn(window, 'helloWorldOne').and.callThrough();
+		window.helloWorldOne('Hello world 1!!!');
+	});
+
+	it('says hello', () => {
+		expect(window.helloWorldOne).toHaveBeenCalled();
+		expect(window.helloWorldOne).toHaveBeenCalledWith('Hello world 1!!!');
 	});
 });

@@ -1,7 +1,7 @@
 module.exports = function(config) {
 	config.set({
 		basePath: '',
-		files: 'src/**/*.js',
+		files: ['src/**/*.js'],
 		exclude: [],
 		autoWatch: true,
 		browsers: ['PhantomJS'],
