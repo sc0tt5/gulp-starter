@@ -117,19 +117,21 @@ const config = {
 //-------------------------------------
 
 // complile scss to build
-gulp.task('css:dev', () =>
-	gulp
-		.src(paths.src.scss)
-		.pipe($.plumber({ errorHandler: notifyError }))
-		.pipe($.changed(paths.build.css, config.changed)) // only allow changed files (supports 1:1 only)
-		.pipe($.print.default()) // show files coming into stream
-		.pipe($.sourcemaps.init({ loadMaps: true }))
-		.pipe($.sass(config.sass))
-		.pipe($.autoprefixer())
-		.pipe($.size(config.size)) // show file size
-		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(paths.build.css))
-		.pipe($.connect.reload()) // refresh in browser
+gulp.task(
+	'css:dev',
+	() =>
+		gulp
+			.src(paths.src.scss)
+			.pipe($.plumber({ errorHandler: notifyError }))
+			.pipe($.changed(paths.build.css, config.changed)) // only allow changed files (supports 1:1 only)
+			.pipe($.print.default()) // show files coming into stream
+			.pipe($.sourcemaps.init({ loadMaps: true }))
+			.pipe($.sass(config.sass))
+			.pipe($.autoprefixer())
+			.pipe($.size(config.size)) // show file size
+			.pipe($.sourcemaps.write('.'))
+			.pipe(gulp.dest(paths.build.css))
+			.pipe($.connect.reload()) // refresh in browser
 );
 
 // concat, minimize, and move to public
@@ -150,7 +152,7 @@ gulp.task('css:dist', () =>
 //-------------------------------------
 
 // transpile js to build
-gulp.task('js:dev',	() =>
+gulp.task('js:dev', () =>
 	gulp
 		.src(paths.src.js)
 		.pipe($.plumber({ errorHandler: notifyError }))
@@ -175,7 +177,9 @@ gulp.task('js:dist', () =>
 		.pipe($.newer({ dest: paths.dist.js }))
 		.pipe($.print.default())
 		.pipe($.concat('scripts.min.js'))
-		.pipe($.uglify(config.uglify).on('error', error => $.notify(`js:dist task error: ${error}`)))
+		.pipe(
+			$.uglify(config.uglify).on('error', error => $.notify(`js:dist task error: ${error}`))
+		)
 		.pipe($.header(banner('js'), { pkg: pkg }))
 		.pipe($.size(config.size))
 		.pipe(gulp.dest(paths.dist.js))
@@ -368,4 +372,5 @@ gulp.task('default', () => {
 gulp.task('reset', () => {
 	gulp.src(paths.dist.base, { read: false }).pipe($.clean(paths.dist.base)); // remove dist
 	gulp.src(paths.build.base, { read: false }).pipe($.clean(paths.build.base)); // remove build
+	gulp.src('./tmp/', { read: false }).pipe($.clean('./tmp/')); // tmp (test report)
 });
