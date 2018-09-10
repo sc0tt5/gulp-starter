@@ -63,9 +63,8 @@ const config = {
 		removeComments: true
 	},
 	// test runner
-	karma: {
-		configFile: require('path').resolve('karma.conf.js'),
-		singleRun: true
+	karma: ci => {
+		return { configFile: require('path').resolve('karma.conf.js'), singleRun: !ci }; // ci = true for watch
 	},
 	// image compression
 	image: {
@@ -291,8 +290,14 @@ gulp.task('html:dist', () => {
 
 const Server = karma.Server;
 
-gulp.task('test', done => {
-	new Server(config.karma, done).start();
+// continuous integration mode
+gulp.task('test:dev', done => {
+	new Server(config.karma(true), done).start();
+});
+
+// run once
+gulp.task('test:dist', done => {
+	new Server(config.karma(false), done).start();
 });
 
 // server
@@ -337,15 +342,21 @@ gulp.task('server:dist', $.sequence('connect:dist', 'open:dist')); // used for p
 // watch for changes
 gulp.task('watch', () => {
 	gulp.watch('src/**/*.scss', ['css:dev']);
-	gulp.watch('src/**/*.js', ['js:dev']);
+	gulp.watch('src/**/*.js', () => {
+		$.sequence('js:dev', 'test:dev')(error => {
+			if (error) {
+				$.notify(`watch task gulp-sequence error: ${error}`);
+			}
+		});
+	});
 	gulp.watch('src/**/*.html', ['html:dist']);
 });
 
 // prod build
 gulp.task('build', () => {
-	$.sequence('css:dist', 'js:dist', 'img:dist', 'lib:dist', 'html:dist', 'server:dist')(error => {
+	$.sequence('test:dist', 'css:dist', 'js:dist', 'img:dist', 'lib:dist', 'html:dist', 'server:dist')(error => {
 		if (error) {
-			$.notify(`dev task gulp-sequence error: ${error}`);
+			$.notify(`build task gulp-sequence error: ${error}`);
 		}
 	});
 });
