@@ -82,7 +82,7 @@ gulp dev
 ```
 gulp build
 ```
+
 ## ToDo
 
--   Jasmine spec files in ES6
 -   Run test on changed file only using gulp-newer, prevent src-to-dist if fail
